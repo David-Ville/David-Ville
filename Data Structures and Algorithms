@@ -1,0 +1,639 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <string>
+#include <cmath>
+#include <ctime>
+#include <cstdlib>
+#include <chrono>
+using namespace std;
+
+class MPQ{ // ordered vector 1a
+    private:
+    vector<int> pq;
+    int N;
+    
+    public:
+    MPQ(){ pq.push_back(-1); N = 0; } // N is size -1
+    ~MPQ(){}
+    
+    
+    void insertOrder(int item){// Insert while swapping to be in Order
+        pq.push_back(item);
+        N++;
+        for(int j=N; j>0; j--){
+            if(pq.at(j-1) > pq.at(j)){
+                swap(pq.at(j-1), pq.at(j));
+            }
+            else { break; }
+        }
+    } // Insert item in Order
+    
+    void print(){ // Print Vector
+        for(int i=1; i<N+1; i++){
+           cout << pq.at(i) << " ";
+        }
+        cout << endl;
+    } // Print Vector
+    
+    bool isEmpty(){ // Check if Empty
+        return N == 0;
+    } // Check if Vector is Empty
+    
+    void delMax(){ // Delete Max V alue
+        pq.pop_back();
+        N--;
+    } // Delete Max Value
+    
+    void insertion1a(int amount){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1A INSERTION TIME
+            for(int i=0; i<amount; i++){
+                insertOrder(rand() % amount);
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1a Insertion Time: " << duration << endl;
+    }
+    
+    void delMax1a(int amount){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1A INSERTION TIME
+            for(int i=0; i<amount; i++){
+                delMax();
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1a delMax Time: " << duration << endl;
+    }
+    
+};////
+
+class Node{ // 1b sll unorder
+    public:
+    Node* next;
+    int data;
+    Node(){
+        next = nullptr;
+        data = 0;
+    }
+    ~Node(){}
+    
+};////
+
+class SLL{ // 1b sll unorder
+    private:
+    Node* front;
+    
+    public:
+    SLL(){ front = nullptr; }
+    ~SLL(){}
+    
+    
+    void print(){ /////////////////print unorder SLL
+        Node* p = front;
+        while(p!=nullptr){
+            cout << p->data << " ";
+            p=p->next;
+        }
+        cout << endl;
+    }
+    
+    void insertEnd(int item){ //////////// insert end of SLL
+        Node* p = front;
+        Node* newNode = new Node();
+        newNode->data = item;
+        if(front == nullptr){
+            newNode->next = front;
+            front = newNode;
+            return;
+        }
+        while(p->next!=nullptr){
+            p=p->next;
+        }
+        newNode->next = nullptr;
+        p->next = newNode;
+        
+    }
+    
+    void delMaxSLL(){ /////////// delete max in unorder SLL
+        Node* p = front;
+        int max = 0;
+        while(p!=nullptr){
+            if(p->data > max){
+                max = p->data;
+            }
+            p=p->next;
+        }
+        p = front;
+        if(max!=front->data){
+            while(p->next->data!=max){
+                p=p->next;
+            }
+            Node* del = p->next;
+            Node* n = del->next;
+            p->next = n;
+            delete del;
+        } 
+        else { 
+            front = p->next;
+            delete p; 
+        }
+    }
+    
+    void insertion1b(int amount){ 
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1B INSERTION TIME
+            for(int i=0; i<amount; i++){
+                insertEnd(rand() % amount);
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1b Insertion Time: " << duration << endl;
+    }
+    
+    void delMax1b(int amount){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1B DELETE TIME
+            for(int i=0; i<amount; i++){
+                delMaxSLL();
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1b delMax Time: " << duration << endl;
+    }
+    
+};////
+
+class heapLL{ //1c SLL BH
+    private:
+    Node* front;
+    
+    public: 
+    heapLL(){ front = nullptr; }
+    ~heapLL(){}
+    
+    
+    void print(){ ////////// print heap LL 
+        Node* p = front;
+        while(p!=nullptr){
+            cout << p->data << " ";
+            p=p->next;
+        }
+        cout << endl;
+    }
+    
+    int size(){ ///////////// size of heap LL
+        Node* p = front;
+        int size = 0;
+        while(p!=nullptr){
+            size++;
+            p=p->next;
+        }
+        return size;
+    }
+    
+    void swim(){ ////////////// swim LL after insert
+        Node* p = front;
+        Node* c = front;
+        int pos = 1;
+        while(p->next!=nullptr){
+            p=p->next;
+            pos++;
+        }
+        int k = pos;
+        for (int j=1; j<k/2; j++){
+            c=c->next;
+        }
+        while (k>1 && c->data<p->data){
+            int temp = p->data;
+            p->data = c->data;
+            c->data = temp;
+            k = k/2;
+            p = front;
+            c = front;
+            if(k==1){
+                break;
+            }else {
+                for(int i=1; i<k; i++){
+                    p=p->next; 
+                }
+                for(int i=1; i<k/2; i++){
+                    c=c->next; 
+                }
+            }
+        }
+        
+    }
+    
+    void insert(int item){ ///////// insert LL with swim
+        Node* p = front;
+        Node* newNode = new Node();
+        newNode->data = item;
+        if(front == nullptr){
+            newNode->next = front;
+            front = newNode;
+            return;
+        }
+        while(p->next!=nullptr){
+            p=p->next;
+        }
+        newNode->next = nullptr;
+        p->next = newNode;
+        swim();
+        
+    }
+    
+    void sink(){ /////////////// sink LL after del max
+        Node* p = front;
+        Node* left = front;
+        Node* right = front;
+        int N = size();
+        int k = 1;
+        while (2*k <= N){
+            int j = 2*k;
+            
+            p = front;
+            for(int f=1; f<k; f++){
+                p=p->next;
+            }
+            left = front;
+            for(int i=1; i<j; i++){
+                left=left->next;
+            }
+            right = front;
+            for(int h=1; h<j+1; h++){
+                right=right->next;
+            }
+            
+            if(j<N && left->data < right->data){
+                j++;
+            }
+            
+            if(right!=nullptr){
+                if(p->data > left->data && p->data > right->data){ break; }
+            }
+            else{
+                if(p->data > left->data) { break; }
+            }
+            
+            if(right!=nullptr){
+                if(left->data < right->data){
+                    int temp = p->data;
+                    p->data = right->data;
+                    right->data = temp;
+                }
+                else{
+                    int temp = p->data;
+                    p->data = left->data;
+                    left->data = temp;
+                }
+            }
+            else {
+                int temp = p->data;
+                p->data = left->data;
+                left->data = temp;
+            }
+            k = j;
+        }
+    }
+    
+    void delMaxSLL(){ /////////////// delete max with sink
+        Node* p = front;
+        Node* del;
+        if( front == nullptr ){
+            return;
+        }
+        if(front->next == nullptr){
+            front = nullptr;
+            delete p;
+            return;
+        }
+        while(p->next->next!=nullptr){
+            p=p->next;
+        }
+        del = p->next;
+        int temp = del->data;
+        del->data = front->data;
+        front->data = temp;
+        
+        p->next = nullptr;
+        delete del;
+        sink();
+         
+    }
+    
+    void insertion1c(int amount){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1c INSERTION TIME
+            for(int i=0; i<amount; i++){
+                insert(rand() % amount);
+                print();
+            }
+        /*auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1c Insertion Time: " << duration << endl;*/
+    }
+    
+    void delMax1c(int amount){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1c DELETE TIME
+            for(int i=0; i<amount; i++){
+                delMaxSLL();
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1c delMax Time: " << duration << endl;
+    }
+    
+};////
+
+class tnode{ // 1d BTBH
+    public:
+    tnode* parent;
+    tnode* left;
+    tnode* right;
+    int data;
+    tnode(){ 
+        parent = nullptr;
+        left = nullptr;
+        right = nullptr;
+        data = 0;
+    }
+    ~tnode(){}
+    
+}; //////
+
+class pqtree{ // 1d BTBH
+    private: 
+    tnode* top;
+    
+    public:
+    pqtree(){ top = nullptr; }
+    ~pqtree(){}
+    
+    
+    tnode* getTop(){ ///////// Binary Tree Based Heap (BTBH) return top root
+        return top;
+    }
+    
+    void print(tnode* t){ /////////////// BTBH print 
+        if(top==nullptr){
+            cout << "Empty Binary Tree Based Heap" << endl;
+            return;
+        }
+        queue<tnode*> q;
+        q.push(top);
+        
+        while(!q.empty()){
+            t = q.front();
+            q.pop();
+            
+            cout << t->data << " ";
+            if(t->left!=nullptr){
+                q.push(t->left);
+            }
+            if(t->right!=nullptr){
+                q.push(t->right);
+            }
+        }
+        cout << endl;
+    }
+    
+    int size(tnode* t){ /////////// BTBH print size
+        if(t == nullptr){
+            return 0;
+        }
+        if(t!=nullptr){
+            return 1 + size(t->left) + size(t->right);
+        }
+       
+    }
+    
+    void swim(tnode* t){ ///////// BTBH swim for insert
+        if(t == top){
+            return;
+        }
+        if(t->parent->data < t->data){
+            int temp = t->data;
+            t->data = t->parent->data;
+            t->parent->data = temp;
+             swim(t->parent);
+             return;
+        }
+    }
+    
+    void insert(int item, tnode*& t){ ////////// BTBH insert with swim
+        tnode* newnode = new tnode();
+        newnode->data = item;
+        
+        if(top == nullptr){
+            top = newnode;
+            t = top;
+            return; 
+        }
+        queue<tnode*> q;
+        q.push(top);
+        
+        while(!q.empty()){
+            t = q.front();
+            q.pop();
+            
+            if(t->left!=nullptr){
+                q.push(t->left);
+            }
+            else {
+                t->left = newnode;
+                t->left->parent = t;
+                swim(t->left);
+                t = top;
+                return;
+            }
+            if(t->right!=nullptr){
+                q.push(t->right);
+            }
+            else {
+                t->right = newnode;
+                t->right->parent = t;
+                swim(t->right);
+                t = top;
+                return;
+            }
+        }
+    }
+    
+    void sink(tnode* t){ ///////////////// BTBH sink for delete max
+       if(t->left==nullptr && t->right==nullptr){
+           return;
+       }
+       else if(t->left->data < t->data && t->right==nullptr){
+           return;
+       }
+       else if(t->left->data < t->data && t->right->data < t->data){
+           return;
+       }
+       if(t->left!=nullptr && t->right==nullptr){
+           int temp = t->data;
+           t->data = t->left->data;
+           t->left->data = temp;
+           sink(t->left);
+       }
+       else if(t->left->data > t->right->data){
+           int temp = t->data;
+           t->data = t->left->data;
+           t->left->data = temp;
+           sink(t->left);
+       }
+       else{
+           int temp = t->data;
+           t->data = t->right->data;
+           t->right->data = temp;
+           sink(t->right);
+       }
+       
+    }
+    
+    void delMaxbt(tnode* t){ /////////// BTBH delmax with sink
+        if(t == nullptr){
+            return;
+        }
+        
+        if(t->left==nullptr && t->right==nullptr){
+            top = nullptr;
+            delete t;
+            return;
+        }
+        
+        queue<tnode*> q;
+        q.push(top);
+        
+        while(!q.empty()){
+            t = q.front();
+            q.pop();
+            
+            if(t->left!=nullptr){
+                q.push(t->left);
+            }
+            if(t->right!=nullptr){
+                q.push(t->right);
+            }
+        }
+        
+        int temp = top->data;
+        top->data = t->data;
+        t->data = temp;
+        
+        tnode* parent = t->parent;
+        if(parent->left!=nullptr && parent->right!=nullptr){
+            delete t;
+            parent->right = nullptr;
+            sink(top);
+        }
+        else if(parent->left!=nullptr && parent->right==nullptr){
+            delete t;
+            parent->left = nullptr;
+            sink(top);
+        }
+    }
+    
+    void insertion1d(int amount, tnode*& t){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1d INSERTION TIME
+            for(int i=0; i<amount; i++){
+                insert(rand() % amount, t);
+                print(t);
+            }
+        /*auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1d Insertion Time: " << duration << endl; */
+    }
+    
+    void delMax1d(int amount, tnode* t){
+        auto t1 = std::chrono::high_resolution_clock::now(); // 1d DELETE TIME
+            for(int i=0; i<amount; i++){
+                delMaxbt(t);
+            }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+        cout << "1d delMax Time: " << duration << endl;
+    }
+    
+};////
+
+
+
+int main(){
+    srand(99);
+ /*   MPQ order; // Ordered vector
+    for(int i=1; i<=10; i++){
+        cout << "Test: " << i << endl;
+        order.insertion1a(5000);
+        //order.delMax1a(5000);
+        //order.insertion1a(10000);
+        //order.delMax1a(10000);
+        //order.insertion1a(20000);
+        //order.delMax1a(20000);
+        cout << endl;
+    }
+
+    */
+    
+//-------------
+    cout <<endl << endl;
+//-------------
+
+
+
+    SLL unorder;// unorder SLL
+    /*for(int i=1; i<=5; i++){
+        cout << "Test: " << i << endl;
+        unorder.insertion1b(5000);
+        unorder.delMax1b(5000);
+        unorder.insertion1b(10000);
+        unorder.delMax1b(10000);
+        unorder.insertion1b(20000);
+        unorder.delMax1b(20000);
+        cout << endl;
+    }*/
+    
+    
+    
+//--------------
+    cout << endl << endl;
+//--------------
+    
+    
+    
+    heapLL max; //SLL heap
+    for(int i=1; i<=1; i++){
+        cout << "Test: " << i << endl;
+        max.insertion1c(20);
+       // max.delMax1c(5000);
+        //max.insertion1c(10000);
+        //max.delMax1c(10000);
+        //max.insertion1c(20000);
+        //max.delMax1c(20000);
+        cout << endl;
+    }
+    
+    
+    
+//--------------
+    cout << endl << endl;
+//--------------
+    
+    
+   
+    pqtree tree; //Binary tree heap
+    tnode* x = tree.getTop();
+    
+    for(int i=1;i<=1;i++){
+        cout << "Test: " << i << endl;
+        tree.insertion1d(20, x);
+        //tree.delMax1d(5000, x);
+        //tree.insertion1d(10000, x);
+        //tree.delMax1d(10000, x);
+        //tree.insertion1d(20000, x);
+        //tree.delMax1d(20000, x);
+        cout << endl;
+    }
+
+    
+    
+    return 0;
+}
+
+
